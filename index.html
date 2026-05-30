@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Infiltración y Pistas</title>
+    <!-- Pixel Art / Retro Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="game-container">
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen active">
+            <h1 class="retro-title">THE LAST ENDO</h1>
+            <h2 class="retro-subtitle">CAN YOU ESCAPE THE MACHINE?</h2>
+
+            <!-- Removed paragraph as tutorial handles it now -->
+            <p style="font-size: 0.9rem; color: #888;">Controles: WASD o Flechas de Dirección</p>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button id="start-btn">Iniciar Misión</button>
+                <button id="tutorial-btn" class="secondary-btn">Cómo Jugar</button>
+            </div>
+        </div>
+
+        <!-- Tutorial Screen -->
+        <div id="tutorial-screen" class="screen">
+            <!-- MÁS ESPECIFIDAD PARA EVITAR QUE EL FONDo RETRO PREDOMINE -->
+            <style>
+                #tutorial-screen h3, 
+                #tutorial-screen p, 
+                #tutorial-screen b, 
+                #tutorial-screen .tutorial-card,
+                #tutorial-screen .tutorial-card p {
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+                    letter-spacing: normal !important;
+                    line-height: 1.5 !important;
+                }
+                #tutorial-screen p {
+                    font-size: 0.95rem !important;
+                }
+                #tutorial-screen {
+                    padding-bottom: 40px !important; /* Para que no se corte el botón de Entendido */
+                    overflow-y: auto;
+                }
+                #close-tutorial-btn {
+                    margin-bottom: 20px;
+                }
+            </style>
+            <h1>Manual de <span class="highlight">Operaciones</span></h1>
+
+            <div class="tutorial-grid">
+                <div class="tutorial-card">
+                    <div class="tutorial-sprite-container">
+                        <div id="tut-player"></div>
+                    </div>
+                    <h3>Tú (Infiltrador)</h3>
+                    <p>Usa <b>WASD</b> o las <b>Flechas de dirección</b> para moverte por las sombras de los niveles. Tienes un límite de <b>tiempo</b> que decrece constantemente. Pierdes si la cuenta regresiva llega a cero antes de completar el nivel.</p>
+                </div>
+
+                <div class="tutorial-card">
+                    <div class="tutorial-sprite-container">
+                        <div id="tut-enemy">
+                            <!-- Cono de visión eliminado según petición -->
+                        </div>
+                    </div>
+                    <h3>Los Guardias</h3>
+                    <p>Unidades hostiles patrullan el mapa. Mantente alejado de su campo de visión frontal en todo momento. Si te detectan visualmente, activarán la alarma y tu misión fallará inmediatamente.</p>
+                </div>
+
+                <div class="tutorial-card">
+                    <div class="tutorial-sprite-container"
+                        style="display:flex; gap:15px; justify-content:center; align-items:center;">
+                        <div>
+                            <div id="tut-clue"></div>
+                            <small class="highlight" style="display:block; margin-top:5px; font-family: sans-serif;">Evidencia</small>
+                        </div>
+                        <div>
+                            <div id="tut-fake"></div>
+                            <small class="danger-text" style="display:block; margin-top:5px; font-family: sans-serif;">Basura</small>
+                        </div>
+                    </div>
+                    <h3>Investigación (Point & Click)</h3>
+                    <p>Acércate al mobiliario para inspeccionar. Lee bien el <b>acertijo superior</b> para saber en qué tipo de objeto buscar. Pulsar un objeto <b>Falso</b> sumará un error y restará -15s de tiempo (con 3 errores fracasa la inspección). Si estás atascado, el botón de [💡 Pista] puede guiarte a costa de algunos valiosos segundos.</p>
+                </div>
+            </div>
+
+            <button id="close-tutorial-btn" style="margin-top:20px;">Entendido</button>
+        </div>
+
+        <!-- Phase 1: Stealth Mode -->
+        <div id="stealth-screen" class="screen">
+            <!-- Walls will be generated here by JS -->
+            <!-- The background image for walls will be set via CSS on #stealth-screen or the walls themselves -->
+
+            <div id="player"></div>
+
+            <!-- Enemies and POIs generated in JS to easily place them around the map -->
+        </div>
+
+        <!-- Phase 2: Point & Click Mode -->
+        <div id="point-screen" class="screen">
+            <div id="ui-header">
+                <div class="stat" style="cursor: pointer;" id="hint-btn">
+                    <span>💡 Pista (-15s)</span>
+                </div>
+                <div class="stat">
+                    <span>Errores:</span>
+                    <span id="mistakes-display" class="danger-text">0/3</span>
+                </div>
+            </div>
+            <div id="scene-image">
+                <!-- Los elementos generados dinámicamente según el nivel se adjuntarán aquí -->
+            </div>
+        </div>
+
+        <!-- POI Intro Screen -->
+        <div id="poi-intro-screen" class="screen">
+            <h2 class="retro-subtitle" style="margin-bottom: 20px;">SEÑAL DETECTADA</h2>
+            <div id="poi-riddle"
+                style="font-size: 1.5rem; color: #fff; max-width: 600px; margin-bottom: 30px; font-style: italic;">
+                <!-- Riddle injected here -->
+            </div>
+            <button id="start-poi-btn">Iniciar Búsqueda</button>
+        </div>
+
+        <!-- Paper Reveal Screen (Inter-POI) -->
+        <div id="paper-reveal-screen" class="screen">
+            <h2 class="retro-subtitle" style="margin-bottom: 20px;">Pista Recuperada</h2>
+            <div class="paper-container">
+                <div class="paper-fragment fg-1" id="paper-clue-1"></div>
+                <div class="paper-fragment fg-2" id="paper-clue-2"></div>
+                <div class="paper-fragment fg-3" id="paper-clue-3"></div>
+            </div>
+            <button id="close-paper-btn" style="margin-top:20px;">Continuar Misión</button>
+        </div>
+
+        <!-- Lore Document Screen (Between Levels) -->
+        <div id="lore-screen" class="screen">
+            <h2 class="retro-subtitle" style="margin-bottom: 10px;">Sector Asegurado</h2>
+            <div class="paper-container">
+                <div id="lore-content" class="lore-text">
+                    <!-- Content injected by JS -->
+                </div>
+            </div>
+            <button id="continue-lore-btn" style="margin-top:20px;">Infiltrarse al Siguiente Nivel</button>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="game-over-screen" class="screen">
+            <h1 class="danger-text">Misión Fallida</h1>
+            <p id="game-over-reason">¡El enemigo te atrapó!</p>
+            <button id="restart-btn" class="danger-btn">Reintentar</button>
+        </div>
+
+        <!-- Keypad Terminal Screen -->
+        <div id="keypad-screen" class="screen">
+            <h2 class="retro-subtitle">TERMINAL DE SEGURIDAD</h2>
+            <div class="keypad-container">
+                <div class="keypad-display" id="keypad-display">_ _ _ _</div>
+                <div class="keypad-grid">
+                    <button class="keypad-btn">1</button><button class="keypad-btn">2</button><button
+                        class="keypad-btn">3</button>
+                    <button class="keypad-btn">4</button><button class="keypad-btn">5</button><button
+                        class="keypad-btn">6</button>
+                    <button class="keypad-btn">7</button><button class="keypad-btn">8</button><button
+                        class="keypad-btn">9</button>
+                    <button class="keypad-btn danger-btn" id="keypad-clear">C</button><button
+                        class="keypad-btn">0</button><button class="keypad-btn" id="keypad-enter"
+                        style="color:var(--primary); border-color:var(--primary);">E</button>
+                </div>
+                <div id="keypad-status" style="margin-top: 15px; font-size: 1.2rem; height: 1.5rem;"></div>
+            </div>
+            <button id="close-keypad-btn" style="margin-top:20px;">ABORTAR</button>
+        </div>
+
+        <!-- Hacker Terminal Minigame Screen (Level 5) -->
+        <div id="hack-screen" class="screen">
+            <h2 class="retro-subtitle" style="margin-bottom: 5px;">ANULACIÓN DE NÚCLEO O.M.N.I.</h2>
+            <div id="hack-terminal">
+                <div class="hack-header">ACCESO RESTRINGIDO - MODO SUPERUSUARIO</div>
+                <div class="hack-body">
+                    <p id="hack-glitch-text" class="hack-glitch">INICIANDO PUERTA TRASERA...</p>
+                    <p id="hack-prompt" class="hack-pista">Esperando input...</p>
+                    <div class="hack-input-line">
+                        <span class="prompt-char">&gt;</span>
+                        <span id="hack-display" class="hack-value">_</span><span class="cursor-blink">|</span>
+                    </div>
+                </div>
+                <div class="hack-status-bar">
+                    ESTADO: <span id="hack-status-msg" style="color:#00ff88">LISTO</span> | INTENTOS: <span
+                        id="hack-mistakes" class="danger-text">0/3</span>
+                </div>
+            </div>
+
+            <div class="hack-keyboard">
+                <div class="hack-keys-grid">
+                    <button class="hack-key">1</button><button class="hack-key">2</button><button
+                        class="hack-key">3</button>
+                    <button class="hack-key">4</button><button class="hack-key">5</button><button
+                        class="hack-key">6</button>
+                    <button class="hack-key">7</button><button class="hack-key">8</button><button
+                        class="hack-key">9</button>
+                    <button class="hack-key danger-btn">C</button><button class="hack-key">0</button><button
+                        class="hack-key submit-btn">E</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Victory Screen -->
+        <div id="victory-screen" class="screen">
+            <h1 class="highlight">Misión Cumplida</h1>
+            <p>Has encontrado todas las pistas sin ser detectado.</p>
+            <button id="victory-restart-btn">Jugar de Nuevo</button>
+        </div>
+
+        <!-- Global HUD (Bottom) -->
+        <div id="global-hud">
+            <div class="hud-stat">
+                <span>Tiempo:</span>
+                <span id="global-timer" class="highlight">05:00</span>
+            </div>
+            <div class="hud-stat">
+                <span>Pistas:</span>
+                <span id="global-clues" class="highlight">0/9</span>
+            </div>
+        </div>
+        
+        <!-- Joystick Overlay (Mobile only) -->
+        <div id="joystick-zone">
+            <div id="joystick-base">
+                <div id="joystick-stick"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio elements configuration handled in script.js -->
+    <script src="script.js?v=3.0"></script>
+</body>
+
+</html>

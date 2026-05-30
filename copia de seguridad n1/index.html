@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infiltración y Pistas</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen active">
+            <h1>Operación: <span class="highlight">Sigilo</span></h1>
+            <p>Evita al guardia patrullando, acércate a los puntos de interés y busca las pistas antes de que se agote el tiempo inicial. ¡Si te atrapan, se acaba el juego!</p>
+            <p style="font-size: 0.9rem; color: #888;">Controles: WASD o Flechas de Dirección</p>
+            <button id="start-btn">Iniciar Misión</button>
+        </div>
+
+        <!-- Phase 1: Stealth Mode -->
+        <div id="stealth-screen" class="screen">
+            <div id="player"></div>
+            <div id="enemy"></div>
+            <div class="poi" id="poi-1" style="top: 15%; left: 80%;"></div>
+            <div class="poi" id="poi-2" style="top: 80%; left: 20%;"></div>
+            <div class="poi" id="poi-3" style="top: 60%; left: 80%;"></div>
+        </div>
+
+        <!-- Phase 2: Point & Click Mode -->
+        <div id="point-screen" class="screen">
+            <div id="ui-header">
+                <div class="stat">
+                    <span>Tiempo Restante:</span>
+                    <span id="timer-display" class="danger-text">15s</span>
+                </div>
+                <div class="stat">
+                    <span>Pistas:</span>
+                    <span id="clues-display" class="highlight">0/3</span>
+                </div>
+            </div>
+            <div id="scene-image">
+                <div class="clue" id="clue-1" style="top: 30%; left: 40%;"></div>
+                <div class="clue" id="clue-2" style="top: 70%; left: 20%;"></div>
+                <div class="clue" id="clue-3" style="top: 50%; left: 80%;"></div>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="game-over-screen" class="screen">
+            <h1 class="danger-text">Misión Fallida</h1>
+            <p id="game-over-reason">¡El enemigo te atrapó!</p>
+            <button id="restart-btn" class="danger-btn">Reintentar</button>
+        </div>
+
+        <!-- Victory Screen -->
+        <div id="victory-screen" class="screen">
+            <h1 class="highlight">Misión Cumplida</h1>
+            <p>Has encontrado todas las pistas sin ser detectado.</p>
+            <button id="victory-restart-btn">Jugar de Nuevo</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
