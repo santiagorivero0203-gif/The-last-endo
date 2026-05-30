@@ -1955,6 +1955,13 @@ function resizeGame() {
 // Mostrar/ocultar joystick según movimiento (teclas o toque)
 function updateJoystickVisibility() {
     const joystick = document.getElementById('joystick-zone');
+    // Solo permitir joystick en el estado de juego 'stealth'
+    if (gameState !== 'stealth') {
+        joystick.style.display = 'none';
+        joystick.style.opacity = '0';
+        return;
+    }
+    
     // Si alguna tecla de movimiento está activa o el joystick táctil está activo
     const moving = keys['w'] || keys['a'] || keys['s'] || keys['d'] ||
                    keys['ArrowUp'] || keys['ArrowDown'] || keys['ArrowLeft'] || keys['ArrowRight'] || joystickActive;

@@ -38,8 +38,7 @@ body {
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
     overflow: hidden;
-    transform-origin: top left;
-    /* Center the container in the viewport */
+    transform-origin: center center; /* IMPORTANT for translate+scale combo */
     position: absolute;
     left: 50%;
     top: 50%;
