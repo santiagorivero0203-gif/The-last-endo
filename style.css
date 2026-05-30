@@ -38,7 +38,12 @@ body {
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
     overflow: hidden;
-    transform-origin: center center;
+    transform-origin: top left;
+    /* Center the container in the viewport */
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .screen {
@@ -1096,7 +1101,9 @@ button.secondary-btn:hover {
     width: 130px;
     height: 130px;
     z-index: 500;
-    display: none; /* Active only via JS if touch device */
+    display: none; /* Visible only when joystick is active */
+    opacity: 0; /* Fade in/out */
+    transition: opacity 0.2s;
 }
 
 #joystick-base {

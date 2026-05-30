@@ -1946,9 +1946,25 @@ function resizeGame() {
     const targetHeight = 560; // 480 play area + 80 HUD
     const scaleX = window.innerWidth / targetWidth;
     const scaleY = window.innerHeight / targetHeight;
-    // Tomar la escala más restrictiva para no recortar, dejando un margen del 2%
+    // Escala más restrictiva y deja un pequeño margen
     const scale = Math.min(scaleX, scaleY) * 0.98;
-    container.style.transform = `scale(${scale})`;
+    // Mantener centrado + escalar
+    container.style.transform = `translate(-50%, -50%) scale(${scale})`;
+}
+
+// Mostrar/ocultar joystick según movimiento (teclas o toque)
+function updateJoystickVisibility() {
+    const joystick = document.getElementById('joystick-zone');
+    // Si alguna tecla de movimiento está activa o el joystick táctil está activo
+    const moving = keys['w'] || keys['a'] || keys['s'] || keys['d'] ||
+                   keys['ArrowUp'] || keys['ArrowDown'] || keys['ArrowLeft'] || keys['ArrowRight'] || joystickActive;
+    if (moving) {
+        joystick.style.display = 'block';
+        joystick.style.opacity = '1';
+    } else {
+        joystick.style.display = 'none';
+        joystick.style.opacity = '0';
+    }
 }
 
 // Lógica del Botón de Pistas (Hint)
