@@ -1946,34 +1946,34 @@ function resizeGame() {
     const targetHeight = 560; // 480 play area + 80 HUD
     const scaleX = window.innerWidth / targetWidth;
     const scaleY = window.innerHeight / targetHeight;
-    // Escala más restrictiva y deja un pequeño margen
-    const scale = Math.min(scaleX, scaleY) * 0.98;
+    // Tomar la máxima escala posible sin deformar ni recortar
+    const scale = Math.min(scaleX, scaleY);
     // Mantener centrado + escalar
     container.style.transform = `translate(-50%, -50%) scale(${scale})`;
 }
 
-// Mostrar/ocultar joystick según movimiento (teclas o toque)
+window.addEventListener('resize', () => {
+    // Pequeño retraso para asegurar que las dimensiones de móvil se actualizaron
+    setTimeout(resizeGame, 100);
+});
+window.addEventListener('orientationchange', () => {
+    setTimeout(resizeGame, 200);
+});
+
+// Mostrar/ocultar joystick según estado del juego
 const isTouchDevice = ('ontouchstart' in window || navigator.maxTouchPoints > 0);
 
 function updateJoystickVisibility() {
     const joystick = document.getElementById('joystick-zone');
     
-    // Solo permitir joystick en dispositivos táctiles Y en el estado de juego 'stealth'
-    if (!isTouchDevice || gameState !== 'stealth') {
-        joystick.style.display = 'none';
-        joystick.style.opacity = '0';
-        return;
-    }
-    
-    // Si alguna tecla de movimiento está activa o el joystick táctil está activo
-    const moving = keys['w'] || keys['a'] || keys['s'] || keys['d'] ||
-                   keys['ArrowUp'] || keys['ArrowDown'] || keys['ArrowLeft'] || keys['ArrowRight'] || joystickActive;
-    if (moving) {
+    // El joystick DEBE existir visualmente para poder ser tocado
+    if (isTouchDevice && gameState === 'stealth') {
         joystick.style.display = 'block';
-        joystick.style.opacity = '1';
+        // Opacidad completa si lo estamos tocando, semitransparente si está inactivo
+        joystick.style.opacity = joystickActive ? '1' : '0.4';
     } else {
+        // En menús u otras pantallas, desaparecer por completo
         joystick.style.display = 'none';
-        joystick.style.opacity = '0';
     }
 }
 
