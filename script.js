@@ -1287,6 +1287,7 @@ function checkPOIs() {
 }
 
 function gameLoop() {
+    updateJoystickVisibility();
     if (gameState !== 'stealth') return;
     updatePlayer(); updateEnemies(); checkPOIs();
     animFrameId = requestAnimationFrame(gameLoop);
@@ -1960,11 +1961,9 @@ window.addEventListener('orientationchange', () => {
     setTimeout(resizeGame, 200);
 });
 
-// Mostrar/ocultar joystick según estado del juego
-const isTouchDevice = ('ontouchstart' in window || navigator.maxTouchPoints > 0);
-
 function updateJoystickVisibility() {
     const joystick = document.getElementById('joystick-zone');
+    const isTouchDevice = ('ontouchstart' in window || navigator.maxTouchPoints > 0);
     
     // El joystick DEBE existir visualmente para poder ser tocado
     if (isTouchDevice && gameState === 'stealth') {
