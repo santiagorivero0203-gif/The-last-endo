@@ -1953,10 +1953,13 @@ function resizeGame() {
 }
 
 // Mostrar/ocultar joystick según movimiento (teclas o toque)
+const isTouchDevice = ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+
 function updateJoystickVisibility() {
     const joystick = document.getElementById('joystick-zone');
-    // Solo permitir joystick en el estado de juego 'stealth'
-    if (gameState !== 'stealth') {
+    
+    // Solo permitir joystick en dispositivos táctiles Y en el estado de juego 'stealth'
+    if (!isTouchDevice || gameState !== 'stealth') {
         joystick.style.display = 'none';
         joystick.style.opacity = '0';
         return;
@@ -2022,11 +2025,6 @@ const joystickStick = document.getElementById('joystick-stick');
 let joystickActive = false;
 let joystickCenter = { x: 0, y: 0 };
 let stickMaxRadius = 40; // Rango máximo del joystick visual
-
-// Mostrar el joystick solo en dispositivos táctiles
-if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-    joystickZone.style.display = 'block';
-}
 
 joystickZone.addEventListener('touchstart', handleJoystickStart, { passive: false });
 joystickZone.addEventListener('touchmove', handleJoystickMove, { passive: false });
